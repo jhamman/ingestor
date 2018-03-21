@@ -5,7 +5,6 @@ with open('README.md') as f:
 
 INSTALL_REQUIRES = ['xarray', 'pandas', 'joblib']
 TESTS_REQUIRE = ['pytest']
-EXTRAS_REQUIRE = ['ecmwfapi']
 
 
 setup(name='ingestor',
@@ -18,6 +17,5 @@ setup(name='ingestor',
       packages=['ingestor', 'ingestor.tests'],
       install_requires=INSTALL_REQUIRES,
       tests_require=TESTS_REQUIRE,
-      extras_require=EXTRAS_REQUIRE,
       classifiers=['License :: OSI Approved :: Apache License',
                    'Programming Language :: Python :: 3'])
