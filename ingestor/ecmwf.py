@@ -1,4 +1,5 @@
 import os
+import time
 
 import pandas as pd
 import xarray as xr
@@ -11,12 +12,14 @@ class ECMWFDataSet(object):
     '''kind of like an xarray.Dataset but lazily evaluated from ECMWF'''
 
     def __init__(self, variables, data_dir='./',
-                 file_template='ecmwf_data_%Y-%m.nc', **kwargs):
+                 file_template='ecmwf_data_%Y-%m.nc', options=None):
         self.server = ECMWFDataServer()
 
         self.variables = list(variables)
 
-        self.request = dict(param='/'.join(variables), **kwargs)
+        self.request = dict(param='/'.join(variables), format='netcdf')
+        if options is not None:
+            self.request.update(options)
 
         self._file_template = os.path.join(data_dir, file_template)
         self.filenames = []
@@ -75,10 +78,18 @@ class ECMWFDataSet(object):
         return [dict(date=date, target=target, **self.request)
                 for date, target in zip(self.dates, self.filenames)]
 
+    def _retrieve(self, r, sleep=None):
+        if sleep is not None:
+            time.sleep(sleep)
+        self.server.retrieve(r)
+
     def load(self, n_jobs=20, **kwargs):
         '''run the download jobs in parallel, return a single xarray dataset'''
-        Parallel(n_jobs=n_jobs, **kwargs)(delayed(self.server.retrieve)(r)
-                                          for r in self.requests)
+
+        # sleep a short time so that we don't get the error:
+        # HTTP Error 429: Too Many Requests
+        Parallel(n_jobs=n_jobs, **kwargs)(delayed(self._retrieve)(
+            r, sleep=i*1) for i, r in enumerate(self.requests))
 
         # reconsitute a xarray dataset
         ds = xr.open_mfdataset(self.filenames)

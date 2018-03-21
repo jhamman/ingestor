@@ -13,6 +13,12 @@ def test_init_dataset():
                       file_template='data_%Y-%m.nc')
     assert ds._file_template == '/foo/bar/data_%Y-%m.nc'
 
+    ds = ECMWFDataSet(variables, data_dir='/foo/bar',
+                      file_template='data_%Y-%m.nc',
+                      options={'class': 'ei'})
+
+    assert ds.request['class'] == 'ei'
+
 
 def test_repr():
     variables = ['Temperature', 'Pressure']

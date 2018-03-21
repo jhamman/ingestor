@@ -1,13 +1,9 @@
 # Ingestor
 A library to facilitate the ingestion and normalization of climate datasets
 
-.. image:: https://travis-ci.org/jhamman/ingestor.svg?branch=master
-    :target: https://travis-ci.org/jhamman/ingestor
-    :align: right
+[![Build Status](https://travis-ci.org/jhamman/ingestor.svg?branch=master)](https://travis-ci.org/jhamman/ingestor)
 
-.. image:: https://codecov.io/gh/jhamman/ingestor/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/jhamman/ingestor
-    :align: right
+[![codecov](https://codecov.io/gh/jhamman/ingestor/branch/master/graph/badge.svg)](https://codecov.io/gh/jhamman/ingestor)
 
 Documentation [on Readthedocs](http://ingestor.readthedocs.io/).
 
