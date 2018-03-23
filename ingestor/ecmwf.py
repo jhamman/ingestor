@@ -13,6 +13,28 @@ class ECMWFDataSet(object):
 
     def __init__(self, variables, data_dir='./',
                  file_template='ecmwf_data_%Y-%m.nc', options=None):
+        '''
+        Create a new ECMWFDataSet
+
+        This class manages a series of related requests by submitting and
+        downloading datasets from ECMWF in parallel.
+
+        Parameters
+        ----------
+        variables : list-like
+            List of variables to download.
+        data_dir : str
+            Path to put downloaded files.
+        file_template : str
+            Filename template for downloaded files
+        options : dict, optional
+            Dictionary of additional options to provide to
+            `ECMWFDataServer.retrieve`.
+
+        See also
+        --------
+        ECMWFDataServer.retrieve
+        '''
         self.server = ECMWFDataServer()
 
         self.variables = list(variables)
@@ -46,6 +68,19 @@ class ECMWFDataSet(object):
         return list(self.variables)
 
     def sel(self, time=None, lat=None, lon=None):
+        '''
+        Return a new DataSet by selecting index bounds along the specified
+        temporal and/or spatial dimension(s)
+
+        Parameters
+        ----------
+        time : slice, optional
+            Time period to select (e.g. `slice('1979-09-01', '2015-12-31')`).
+        lat : slice, optional
+            Latitude bounds to select (e.g. `slice(20., 50.)`).
+        lon : slice, optional
+            longitude bounds to select (e.g. `slice(-120.0, -90.)`).
+        '''
 
         if lat or lon:
             # area:  N/W/S/E
@@ -79,12 +114,25 @@ class ECMWFDataSet(object):
                 for date, target in zip(self.dates, self.filenames)]
 
     def _retrieve(self, r, sleep=None):
+        '''call the server retrieve method, the sleep allows for metering'''
         if sleep is not None:
             time.sleep(sleep)
         self.server.retrieve(r)
 
     def load(self, n_jobs=20, **kwargs):
-        '''run the download jobs in parallel, return a single xarray dataset'''
+        '''run the download jobs in parallel, return a single xarray dataset
+
+        Parameters
+        ----------
+        n_jobs : int, optional
+            Number of parallel requests / downloads to perform.
+        kwargs :
+            Additional keyword arguments to pass to joblib.Parallel
+
+        See Also
+        --------
+        joblib.parallel
+        '''
 
         # sleep a short time so that we don't get the error:
         # HTTP Error 429: Too Many Requests
